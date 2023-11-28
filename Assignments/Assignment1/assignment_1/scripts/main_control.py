@@ -62,9 +62,10 @@ if __name__ == "__main__":
                 max_len=params["planning"]["max_len"],
                 min_distance=params["planning"]["min_distance"],
             )
-
+            # print("Target speed: ", target_speed)
             # Pass to controller
             control = controller.compute_control(target_speed, target_trajectory)
+            # print("Control: ", control)
             vehicle.apply_control(control)
 
             # Update info pane

@@ -10,9 +10,9 @@ class PurePursuitLateralController:
 
     def __init__(self, vehicle, L, ld, K_pp):
         self._vehicle = vehicle
-        self._L = L
-        self._ld = ld
-        self._k_pp = K_pp
+        self._L = L # Length of the car
+        self._ld = ld # Lookahead distance
+        self._k_pp = K_pp # Pure pursuit gain 
 
     def run_step(self, waypoints):
         return self._pure_pursuit_control(waypoints, self._vehicle.get_transform())
@@ -47,4 +47,20 @@ class PurePursuitLateralController:
         #######################################################################
         ################## TODO: IMPLEMENT PURE-PURSUIT CONTROL HERE ##########
         #######################################################################
+        print("Vehicle Transform: ", vehicle_transform)
+        # Get the vehicle position
+        vehicle_position = np.array([vehicle_transform.location.x, vehicle_transform.location.y])
+        print("Vehicle Position: ", vehicle_position)
+        print("Waypoints: ", waypoints)
+        # steering = tan_inv (2 * L * sin (alpha) / ld)
+        # alpha = theta - yaw
+        # theta = tan_inv (y2 - y1 / x2 - x1)
+        # Target at lookahead distance from waypoints list 
+        target_index = self._get_goal_waypoint_index(self._vehicle, waypoints, self._ld)
+        theta = math.atan2(waypoints[target_index][1] - vehicle_position[1], waypoints[target_index][0] - vehicle_position[0])
+        yaw = vehicle_transform.rotation.yaw * math.pi / 180
+        alpha = theta - yaw
+        steering = math.atan(2 * self._L * math.sin(alpha) / self._ld)
+        
+        
         return steering
