@@ -26,6 +26,7 @@ class PIDLongitudinalController:
         self._k_d = K_D
         self._k_i = K_I
         self._error_buffer = deque(maxlen=10)
+        self.integral_error = 0
         self._prev_velocity = 0
 
     def run_step(self, target_velocity_ms, debug=False):
@@ -59,8 +60,9 @@ class PIDLongitudinalController:
          
         p_term = self._k_p * (target_velocity_ms - current_velocity_ms) 
         d_term = self._k_d * (current_velocity_ms - self._prev_velocity)
-
-        acceleration += p_term + d_term
+        self.integral_error += (target_velocity_ms - current_velocity_ms) * self._dt
+        i_term = self._k_i * self.integral_error
+        acceleration += p_term + d_term + i_term
         self._prev_velocity = current_velocity_ms
         return acceleration
 
@@ -86,6 +88,7 @@ class PIDLateralController:
         self._k_d = K_D
         self._k_i = K_I
         self.prev_steering_error = 0
+        self.integral_error = 0
         self._error_buffer = deque(maxlen=10)
 
     def run_step(self, waypoints):
@@ -173,11 +176,15 @@ class PIDLateralController:
         # print("yaw_vec", v2)
         # print("steering_direction", steering_direction)
         p_term = self._k_p * steering_direction * steering_error
-        d_term = -1 * self._k_d * (steering_error - self.prev_steering_error)
+        d_term =  self._k_d * (steering_error - self.prev_steering_error) * steering_direction / self._dt
+        # Integral term
+        
+        i_term = self._k_i * self.integral_error
         print("steering error", steering_error)
         print("prev_steering error", self.prev_steering_error)
         print("p_term", p_term)
         print("d_term", d_term)
-        steering += p_term + d_term
+        steering += p_term + d_term + i_term
         self.prev_steering_error = steering_error
+        self.integral_error += steering_error * self._dt 
         return steering

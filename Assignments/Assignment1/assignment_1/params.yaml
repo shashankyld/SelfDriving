@@ -12,7 +12,7 @@ model:
 # Controller related parameters
 control:
 
-  strategy: stanley # pid/pure-pursuit/stanley/mpc
+  strategy: pid # pid/pure-pursuit/stanley/mpc
  
   # Actuation 
   max_throttle: 0.75
@@ -24,18 +24,18 @@ control:
 
     # TODO Tune these parameters
     pid:
-      K_P: 8 # 0.2 for PID Long and Lat
+      K_P: 0.3 # 0.2 for PID Long and Lat
       K_D: 0.1
-      K_I: 0
+      K_I: 0.1
 
   # Lateral controller
   lateral:     
 
     # TODO Tune these parameters
     pid:
-      K_P: 0.03
-      K_D: 0.5
-      K_I: 0
+      K_P: 0.16
+      K_D: 0.09
+      K_I: 0.001
     
     # TODO Tune these parameters
     pure-pursuit:
